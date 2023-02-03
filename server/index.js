@@ -19,10 +19,9 @@ app.get("/", (req, res) => {
 app.post("/upload", (req, res) => {
   const newpath = process.cwd();
   const file = req.files.file;
-  console.log("file---->", file);
 
   const filename = file.name;
-  console.log("name", filename);
+  console.log("name", filename, newpath);
   file.mv(`${newpath}${filename}`, (err) => {
     if (err) {
       res.status(500).send({
