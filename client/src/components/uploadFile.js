@@ -29,7 +29,7 @@ function UploadFile() {
             onUploadProgress: (e) => {
               setUploadProgress((state) => {
                 let loadedPercent = state.uploadPercent;
-                let loaded = {...state.loaded};
+                let loaded = { ...state.loaded };
                 let totalLoaded = state.loadedTotal;
                 totalLoaded -= loaded[file.name];
                 loaded[file.name] = e.loaded;
@@ -48,24 +48,14 @@ function UploadFile() {
           {
             headers: {
               "Content-Type": "multipart/form-data",
-              // Authorization: "JWT fefege...",
               "Access-Control-Allow-Origin": "*",
             },
           }
         );
         resolve({ message: response.data.message, file: file.name });
-        // setUploadProgress((state) => {
-        //   let loadedPercent = state.uploadPercent;
-        //   console.log(
-        //     "loaded",
-        //    Math.round((file.size * 100) / state.total)
-        //   );
-        //   loadedPercent += Math.round((file.size * 100) / state.total);
-        //   return { ...state, uploadPercent: loadedPercent };
-        // });
       } catch (error) {
-        console.log("error:::", error);
-        reject({ message: error.message, file: file.name });
+        console.log("upload one file error", error);
+        reject({ message: error.response.data.err, file: file.name });
       }
     });
   };
@@ -83,15 +73,14 @@ function UploadFile() {
     });
     let files = e.target.files;
     setUploadProgress((state) => {
-      
       let loaded = {};
-     
+
       let newTotal = 0;
       Object.values(files).forEach((file) => {
         loaded[file.name] = 0;
         newTotal += file.size;
       });
-      
+
       return { ...state, total: newTotal, loading: true, loaded: loaded };
     });
 
@@ -105,7 +94,10 @@ function UploadFile() {
       } catch (error) {
         console.log("error:::", error);
         setFileUploadState((state) => {
-          let notUploaded = [...state.notUploaded, error.file];
+          let notUploaded = [
+            ...state.notUploaded,
+            `${error.file}(${error.message})`,
+          ];
           return { ...state, notUploaded: notUploaded };
         });
       }
